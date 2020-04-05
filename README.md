@@ -100,8 +100,8 @@ that would otherwise result due to the splitting of blocks upon allocation.
 
 ## Block Headers & Footers
 
-In **Chapter 9.9.6 Page 847 Figure 9.35**, a block header is defined as 2 words
-(32 bits) to hold the block size and allocated bit. In this assignment, the header
+A block header is defined as 2 words
+(32 bits) to hold the block size and allocated bit. In this program, the header
 will be 4 words (i.e. 64 bits or 1 memory row). The header fields will be similar
 to those in the textbook but you will keep an extra field for recording whether
 or not the previous block is allocated.
@@ -151,21 +151,12 @@ in the heap is allocated and 0 if it is not.
 > be enough space to store the header, footer, and freelist links when the block is free.
 > 
 > Although 16-byte alignment would be adequate for the x86-64 architecture,
-> in this assignment we have arbitrarily set the alignment requirement to 64 bytes.
+> in this program I have arbitrarily set the alignment requirement to 64 bytes.
 > In this case, even an allocation request of size 1 will require a block size of at
 > least 64 bytes, so the minimum block size for your allocator will be 64 bytes.
 > The 64 byte alignment requirement is not motivated by any practical considerations;
 > it has been imposed for no reason other than to cause the assignment parameters to vary
 > from what was used in previous semesters.
-
-# Getting Started
-
-Fetch and merge the base code for `hw3` as described in `hw0` from the
-following link: https://gitlab02.cs.stonybrook.edu/cse320/hw3
-
-**Remember to use the `--strategy-option=theirs` flag with the `git merge`
-command as described in the `hw1` doc to avoid merge conflicts in the Gitlab
-CI file.**
 
 ## Directory Structure
 
@@ -187,8 +178,7 @@ CI file.**
 
 The `lib` folder contains the object file for the `sfutil` library. This
 library provides you with several functions to aid you with the implementation
-of your allocator. <span style="color:red">**Do NOT delete this file as it
-is an essential part of your homework assignment.**</span>
+of your allocator. <span style="color:red">**Do NOT delete this file **</span>
 
 The provided `Makefile` creates object files from the `.c` files in the `src`
 directory, places the object files inside the `build` directory, and then links
@@ -201,23 +191,18 @@ will delete all other contained `.o` files.
 The `sfmm.h` header file contains function prototypes and defines the format
 of the various data structures that you are to use.
 
-> :scream: **DO NOT modify `sfmm.h` or the Makefile.** Both will be replaced when we run
-> tests for grading. If you wish to add things to a header file, please create
-> a new header file in the `include` folder
+> :scream: **DO NOT modify `sfmm.h` or the Makefile.**
 
 All functions for your allocator (`sf_malloc`, `sf_realloc`, `sf_free`, and `sf_memalign`)
-**must** be implemented in `src/sfmm.c`.
+**are** implemented in `src/sfmm.c`.
 
 The program in `src/main.c` contains a basic example of using the initialization
 and allocation functions together. Running `make` will create a `sfmm`
 executable in the `bin` directory. This can be run using the command `bin/sfmm`.
 
-> Any functions other than `sf_malloc`, `sf_free`, `sf_realloc`, and `sf_memalign`
-> **WILL NOT** be graded.
-
 # Allocation Functions
 
-You will implement the following four functions in the file `src/sfmm.c`.
+The following four functions in the file `src/sfmm.c` have been implemented.
 The file `include/sfmm.h` contains the prototypes and documentation found here.
 
 Standard C library functions set `errno` when there is an error. To avoid
@@ -282,15 +267,10 @@ void sf_free(void *ptr);
 void *sf_memalign(size_t size, size_t align);
 ```
 
-> :scream: <font color="red">Make sure these functions have these exact names
-> and arguments. They must also appear in the correct file. If you do not name
-> the functions correctly with the correct arguments, your program will not
-> compile when we test it. **YOU WILL GET A ZERO**</font>
-
 # Initialization Functions
 
-In the `build` directory, we have provided you with the `sfutil.o` object file.
-When linked with your program, this object file allows you to access the
+In the `build` directory, there is a `sfutil.o` object file.
+When linked with the program, this object file allows you to access the
 `sfutil` library, which contains the following functions:
 
 This library contains the following functions:
@@ -344,16 +324,16 @@ an initial free block, and on subsequent allocations when a large enough block
 to satisfy the request is not found.
 
 > :scream: As these functions are provided in a pre-built .o file, the source
-> is not available to you. You will not be able to debug these using gdb.
-> You must treat them as black boxes.
+> is not available.
+> They must be treated as black boxes.
 
 # sf_mem_grow
 
-For this assignment, your implementation **MUST ONLY** use `sf_mem_grow` to
-extend the heap.  **DO NOT** use any system calls such as **brk** or **sbrk**
+For this program, my implementation **ONLY** uses `sf_mem_grow` to
+extend the heap.  THere are **NO** system calls such as **brk** or **sbrk**
 to do this.
 
-Function `sf_mem_grow` returns memory to your allocator in pages.
+Function `sf_mem_grow` returns memory to the allocator in pages.
 Each page is 4096 bytes (4 KB) and there are a limited, small number of pages
 available (the actual number may vary, so do not hard-code any particular limit
 into your program).  Each call to `sf_mem_grow` extends the heap by one page and
@@ -393,10 +373,10 @@ on x86-64 Linux Mint:
 > :nerd: You can find these sizes yourself using the sizeof operator.
 > For example, `printf("%lu\n", sizeof(int))` prints 4.
 
-In this assignment we will assume that each "memory row" is 8 bytes (64 bits) in size.
+In this program, one can assume that each "memory row" is 8 bytes (64 bits) in size.
 Note that, although pointers aligned to addresses that are multiples of 16 would be adequate
 to store values of the largest data type (`long double`) supported by the hardware,
-all pointers returned by your `sf_malloc` are to be 64-byte aligned; that is, they will be
+all pointers returned by `sf_malloc` are to be 64-byte aligned; that is, they will be
 addresses that are multiples of 64.
 
 ## Block Header & Footer Fields
@@ -490,7 +470,7 @@ variable and only determined at run time, the `payload` field has been declared
 to be an array of length 0 just to enable the use of `bp->body.payload` to obtain
 a pointer to the payload area, if `bp` is a pointer to `sf_block`.
 
-> :thumbsup:  You can use casts to convert a generic pointer value to one
+> :thumbsup:  One can use casts to convert a generic pointer value to one
 > of type `sf_block *` or `sf_header *`, in order to make use of the above
 > structure definitions to easily access the various fields.
 
@@ -547,15 +527,15 @@ of the list.
 If you need a further introduction to this data structure, you can readily
 find information on it by googling ("circular doubly linked lists with sentinel").
 
-> :scream:  You **MUST** use the `sf_free_list_heads` array for the heads
-> of your free lists and you **MUST** maintain these lists as circular,
+> :scream:  The `sf_free_list_heads` array has been used for the heads
+> of the free lists and maintained these lists as circular,
 > doubly linked lists.
 > The helper functions discussed later, as well as the unit tests,
-> will assume that you have done this when accessing your free lists.
+> will assume that has been done when accessing your free lists.
 
 ## Overall Structure of the Heap: Prologue and Epilogue
 
-Your heap should use a prologue and epilogue (as described in the book, **page 855**) to
+The heap should use a prologue and epilogue to
 arrange for the proper block alignment and to avoid edge cases when coalescing blocks.
 The overall organization of the heap is as shown below:
 
@@ -613,65 +593,65 @@ Whenever the heap is extended, a new epilogue is created at the end of the
 newly added region and the old epilogue becomes the header of the new block.
 This is as described in the book.
 
-We do not make any separate C structure definitions for the prologue and epilogue.
-They can be manipulated using the existing `sf_block` structure, though care must be taken
+We did not make any separate C structure definitions for the prologue and epilogue.
+They have been manipulated using the existing `sf_block` structure, and care has been taken
 not to access fields that are not valid for these special blocks
 (*i.e.* `prev_footer` for the prologue and anything other than `header` and `prev_footer`
 for the epilogue).
 
-As your heap is initially empty, at the time of the first call to `sf_malloc`
-you will need to make one call to `sf_mem_grow` to obtain a page of memory
+As the heap is initially empty, at the time of the first call to `sf_malloc`
+I made one call to `sf_mem_grow` to obtain a page of memory
 within which to set up the prologue and initial epilogue.
 The remainder of the memory in this first page should then be inserted into
 the free list as a single block (note that this will be a "wilderness block").
 
 ## Notes on sf_malloc
 
-When implementing your `sf_malloc` function, first determine if the request size
-is 0.  If so, then return `NULL` without setting `sf_errno`.
-If the request size is non-zero, then you should determine the size of the
+When implementing the `sf_malloc` function, I first determined if the request size
+is 0.  If so, then `NULL` was returned without setting `sf_errno`.
+If the request size is non-zero, then I determined the size of the
 block to be allocated by adding the header size and the size of any necessary
 padding to reach a size that is a multiple of 64 to maintain proper alignment.
-Remember also that the block has to be big enough to store the footer
+Remember that the block is big enough to store the footer
 (which will always be present), as well as the `next` and `prev` pointers when
 the block is free.
 As the `next` and `prev` pointers are not present in an allocated block this
-space can (and should) be overlapped with the payload area.
+space is overlapped with the payload area.
 As has already been discussed, the above constraints lead to a minimum block size
-of 64 bytes, so you should not attempt to allocate any block smaller than this.
-After having determined the required block size, you should determine the
+of 64 bytes, so an attempt to allocate any block smaller than this has not been made.
+After having determined the required block size, I determined the
 smallest free list that would be able to satisfy a request of that size.
 Search that free list from the beginning until the first sufficiently large
 block is found.  If there is no such block, continue with the next larger
 size class.
 If a big enough block is found, then after splitting it (if it will not leave
-a splinter), you should insert the remainder part back into the appropriate
-freelist.  When splitting a block, the "lower part" should be used to
-satisfy the allocation request and the "upper part" should become the remainder.
+a splinter), I inserted the remainder part back into the appropriate
+freelist.  When splitting a block, the "lower part" was used to
+satisfy the allocation request and the "upper part" became the remainder.
 If a big enough block is not found in any of the other freelists, then as a
 last resort consider the "wilderness block" (if any) in the last freelist.
-If this block does not currently exist or is also not big enough, then you
-must use `sf_mem_grow` to request more memory
+If this block does not currently exist or is also not big enough, then 
+`sf_mem_grow` was used to request more memory
 (for requests larger than a page, more than one such call might be required).
 If your allocator ultimately cannot satisfy the request, your `sf_malloc` function
 must set `sf_errno` to `ENOMEM` and return `NULL`.
 
 ### Notes on sf_mem_grow
 
-After each call to `sf_mem_grow`, you must attempt to coalesce the newly
+After each call to `sf_mem_grow`, one must attempt to coalesce the newly
 allocated page with any wilderness block immediately preceding it, in order to build
 blocks larger than one page.  Insert the new (wilderness) block at the beginning of
 the last freelist.
 
-**Note:** Do not coalesce with the prologue or epilogue, or past the beginning
+**Note:** It does not coalesce with the prologue or epilogue, or past the beginning
 or end of the heap.
 
 ## Notes on sf_free
 
-When implementing `sf_free`, you must first verify that the pointer being
+When implementing `sf_free`, I first verify that the pointer being
 passed to your function belongs to an allocated block. This can be done by
-examining the fields in the block header and footer.  In this assignment,
-we will consider the following cases to be invalid pointers:
+examining the fields in the block header and footer.  In this program,
+we consider the following cases to be invalid pointers:
 
 - The pointer is `NULL`.
 - The pointer is not aligned to a 64-byte boundary.
@@ -681,14 +661,14 @@ we will consider the following cases to be invalid pointers:
 - The `prev_alloc` field is 0, indicating that the previous block is free,
   but the `alloc` field of the previous block header is not 0.
 
-If an invalid pointer is passed to your function, you must call `abort` to exit
+If an invalid pointer is passed to your function, `abort` is called to exit
 the program.  Use the man page for the `abort` function to learn more about this.
 
-After confirming that a valid pointer was given, you must free the block.
+After confirming that a valid pointer was given, it must free the block.
 First, the block must be coalesced with any adjacent free block.
 Then, determine the size class appropriate for the (now-coalesced) block and
 inserting the block at the beginning of the free list for that size class.
-A wilderness block must be inserted in the last free list; all other blocks
+A wilderness block is inserted in the last free list; all other blocks
 must be inserted in lists before the last.
 
 Note that blocks in a free list must **not** be marked as allocated,
