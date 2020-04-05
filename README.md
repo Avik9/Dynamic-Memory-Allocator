@@ -27,7 +27,7 @@ Each individual free list will be organized as a **circular, doubly linked list*
 The size classes are based on a Fibonacci sequence (1, 2, 3, 5, 8, 13, ...),
 according to the following scheme:
 The first free list (at index 0) holds blocks of the minimum size `M`
-(where `M = 64` for this assignment).
+(where `M = 64` for this program).
 The second list (at index 1) holds blocks of size `2M`.
 The third list (at index 2) holds blocks of size `3M`.
 The fourth list holds blocks whose size is in the interval `(3M, 5M]`.
@@ -78,16 +78,16 @@ were implemented.
 
 The allocator splits blocks at allocation time to reduce the amount of
 internal fragmentation. Due to alignment and overhead constraints, there is a minimum useful block size
-that the allocator can support.  **For this assignment, pointers returned by the allocator
+that the allocator can support.  **For this program, pointers returned by the allocator
 in response to allocation requests are aligned to 64-byte boundaries**;
 *i.e.* the pointers returned will be addresses that are multiples of 2^6.
 Note that this is a more stringent alignment requirement than what is imposed by the
 underlying hardware, which only requires alignment to 16-byte boundaries.
-The 64-byte alignment requirement implies that the minimum block size for your allocator
+The 64-byte alignment requirement implies that the minimum block size for the allocator
 will be 64 bytes.  No "splinters" of smaller size than this are ever to be created.
 If splitting a block to be allocated would result in a splinter, then the block should
 not be split; rather, the block should be used as-is to satisfy the allocation request
-(*i.e.*, you will "over-allocate" by issuing a block slightly larger than that required).
+(*i.e.*, "over-allocate" by issuing a block slightly larger than that required).
 
 ## Freeing a Block
 
@@ -103,7 +103,7 @@ that would otherwise result due to the splitting of blocks upon allocation.
 A block header is defined as 2 words
 (32 bits) to hold the block size and allocated bit. In this program, the header
 will be 4 words (i.e. 64 bits or 1 memory row). The header fields will be similar
-to those in the textbook but you will keep an extra field for recording whether
+to those in the textbook but I will keep an extra field for recording whether
 or not the previous block is allocated.
 Each free block will also have a footer, which occupies the last memory row of the block.
 The footer of a free block contains exactly the same information as the header.
@@ -153,9 +153,9 @@ in the heap is allocated and 0 if it is not.
 > Although 16-byte alignment would be adequate for the x86-64 architecture,
 > in this program I have arbitrarily set the alignment requirement to 64 bytes.
 > In this case, even an allocation request of size 1 will require a block size of at
-> least 64 bytes, so the minimum block size for your allocator will be 64 bytes.
+> least 64 bytes, so the minimum block size for the allocator will be 64 bytes.
 > The 64 byte alignment requirement is not motivated by any practical considerations;
-> it has been imposed for no reason other than to cause the assignment parameters to vary
+> it has been imposed for no reason other than to cause the program parameters to vary
 > from what was used in previous semesters.
 
 ## Directory Structure
@@ -177,8 +177,8 @@ in the heap is allocated and 0 if it is not.
 </pre>
 
 The `lib` folder contains the object file for the `sfutil` library. This
-library provides you with several functions to aid you with the implementation
-of your allocator. <span style="color:red">**Do NOT delete this file **</span>
+library provides several functions to aid with the implementation
+of the allocator. <span style="color:red">**Do NOT delete this file **</span>
 
 The provided `Makefile` creates object files from the `.c` files in the `src`
 directory, places the object files inside the `build` directory, and then links
@@ -189,11 +189,11 @@ are stored to the `bin` directory.
 will delete all other contained `.o` files.
 
 The `sfmm.h` header file contains function prototypes and defines the format
-of the various data structures that you are to use.
+of the various data structures that are to be used.
 
 > :scream: **DO NOT modify `sfmm.h` or the Makefile.**
 
-All functions for your allocator (`sf_malloc`, `sf_realloc`, `sf_free`, and `sf_memalign`)
+All functions for the allocator (`sf_malloc`, `sf_realloc`, `sf_free`, and `sf_memalign`)
 **are** implemented in `src/sfmm.c`.
 
 The program in `src/main.c` contains a basic example of using the initialization
@@ -206,12 +206,12 @@ The following four functions in the file `src/sfmm.c` have been implemented.
 The file `include/sfmm.h` contains the prototypes and documentation found here.
 
 Standard C library functions set `errno` when there is an error. To avoid
-conflicts with these functions, your allocation functions will set `sf_errno`, a
+conflicts with these functions, the allocation functions will set `sf_errno`, a
 variable declared as `extern` in `sfmm.h`.
 
 ```c
 /*
- * This is your implementation of sf_malloc. It acquires uninitialized memory that
+ * This is the implementation of sf_malloc. It acquires uninitialized memory that
  * is aligned and padded properly for the underlying system.
  *
  * @param size The number of bytes requested to be allocated.
@@ -270,7 +270,7 @@ void *sf_memalign(size_t size, size_t align);
 # Initialization Functions
 
 In the `build` directory, there is a `sfutil.o` object file.
-When linked with the program, this object file allows you to access the
+When linked with the program, this object file allows to access the
 `sfutil` library, which contains the following functions:
 
 This library contains the following functions:
@@ -279,20 +279,20 @@ This library contains the following functions:
 /*
  * Any program using the sfmm library must call this function ONCE
  * before issuing any allocation requests. This function DOES NOT
- * allocate any space to your allocator.
+ * allocate any space to the allocator.
  */
 void sf_mem_init();
 
 /*
  * Any program using the sfmm library must call this function ONCE
  * after all allocation requests are complete. If implemented cleanly,
- * your program should have no memory leaks in valgrind after this function
+ * the program should have no memory leaks in valgrind after this function
  * is called.
  */
 void sf_mem_fini();
 
 /*
- * This function increases the size of your heap by adding one page of
+ * This function increases the size of the heap by adding one page of
  * memory to the end.
  *
  * @return On success, this function returns a pointer to the start of the
@@ -306,12 +306,12 @@ void *sf_mem_grow();
 #define PAGE_SZ 4096
 
 /*
- * @return The starting address of the heap for your allocator.
+ * @return The starting address of the heap for the allocator.
  */
 void *sf_mem_start();
 
 /*
- * @return The ending address of the heap for your allocator.
+ * @return The ending address of the heap for the allocator.
  */
 void *sf_mem_end();
 ```
@@ -336,19 +336,19 @@ to do this.
 Function `sf_mem_grow` returns memory to the allocator in pages.
 Each page is 4096 bytes (4 KB) and there are a limited, small number of pages
 available (the actual number may vary, so do not hard-code any particular limit
-into your program).  Each call to `sf_mem_grow` extends the heap by one page and
+into the program).  Each call to `sf_mem_grow` extends the heap by one page and
 returns a pointer to the new page (this will be the same pointer as would have
 been obtained from `sf_mem_end` before the call to `sf_mem_grow`.
 
 The `sf_mem_grow` function also keeps track of the starting and ending addresses
-of the heap for you. You can get these addresses through the `sf_mem_start` and
+of the heap. One can get these addresses through the `sf_mem_start` and
 `sf_mem_end` functions.
 
 > :smile: A real allocator would typically use the **brk**/**sbrk** system calls
 > calls for small memory allocations and the **mmap**/**munmap** system calls
-> for large allocations.  To allow your program to use other functions provided by
+> for large allocations.  To allow the program to use other functions provided by
 > glibc, which rely on glibc's allocator (*i.e.* `malloc`), we have provided
-> `sf_mem_grow` as a safe wrapper around **sbrk**.  This makes it so your heap and
+> `sf_mem_grow` as a safe wrapper around **sbrk**.  This makes it so the heap and
 > the one managed by glibc do not interfere with each other.
 
 # Implementation Details
@@ -370,7 +370,7 @@ on x86-64 Linux Mint:
 | double | Double precision | 8 |
 | long double | Extended precision | 16
 
-> :nerd: You can find these sizes yourself using the sizeof operator.
+> :nerd: One can find these sizes themself using the sizeof operator.
 > For example, `printf("%lu\n", sizeof(int))` prints 4.
 
 In this program, one can assume that each "memory row" is 8 bytes (64 bits) in size.
@@ -500,7 +500,7 @@ found in the footer, anyway.
 
 ## Free List Heads
 
-In the file `include/sfmm.h`, you will see the following declaration:
+In the file `include/sfmm.h`, one will see the following declaration:
 
 ```c
 #define NUM_FREE_LISTS 10
@@ -524,14 +524,14 @@ Inserting into and deleting from a circular doubly linked list is done
 in the usual way, except that, owing to the use of the sentinel, there
 are no edge cases for inserting or removing at the beginning or the end
 of the list.
-If you need a further introduction to this data structure, you can readily
+If one needs a further introduction to this data structure, one can readily
 find information on it by googling ("circular doubly linked lists with sentinel").
 
 > :scream:  The `sf_free_list_heads` array has been used for the heads
 > of the free lists and maintained these lists as circular,
 > doubly linked lists.
 > The helper functions discussed later, as well as the unit tests,
-> will assume that has been done when accessing your free lists.
+> will assume that has been done when accessing the free lists.
 
 ## Overall Structure of the Heap: Prologue and Epilogue
 
@@ -633,7 +633,7 @@ last resort consider the "wilderness block" (if any) in the last freelist.
 If this block does not currently exist or is also not big enough, then 
 `sf_mem_grow` was used to request more memory
 (for requests larger than a page, more than one such call might be required).
-If your allocator ultimately cannot satisfy the request, your `sf_malloc` function
+If the allocator ultimately cannot satisfy the request, the `sf_malloc` function
 must set `sf_errno` to `ENOMEM` and return `NULL`.
 
 ### Notes on sf_mem_grow
@@ -649,7 +649,7 @@ or end of the heap.
 ## Notes on sf_free
 
 When implementing `sf_free`, I first verify that the pointer being
-passed to your function belongs to an allocated block. This can be done by
+passed to the function belongs to an allocated block. This can be done by
 examining the fields in the block header and footer.  In this program,
 we consider the following cases to be invalid pointers:
 
@@ -661,7 +661,7 @@ we consider the following cases to be invalid pointers:
 - The `prev_alloc` field is 0, indicating that the previous block is free,
   but the `alloc` field of the previous block header is not 0.
 
-If an invalid pointer is passed to your function, `abort` is called to exit
+If an invalid pointer is passed to the function, `abort` is called to exit
 the program.  Use the man page for the `abort` function to learn more about this.
 
 After confirming that a valid pointer was given, it must free the block.
@@ -671,13 +671,13 @@ inserting the block at the beginning of the free list for that size class.
 A wilderness block is inserted in the last free list; all other blocks
 must be inserted in lists before the last.
 
-Note that blocks in a free list must **not** be marked as allocated,
+Note that blocks in a free list are **not** be marked as allocated,
 and they must have a valid footer with contents identical to the block header.
 
 # Notes on sf_realloc
 
-When implementing your `sf_realloc` function, you must first verify that the
-pointer and size parameters passed to your function are valid. The criteria for
+When implementing the `sf_realloc` function, it must first verify that the
+pointer and size parameters passed to the function are valid. The criteria for
 pointer validity are the same as those described in the 'Notes on sf_free'
 section above.  If the pointer is valid but the size parameter is 0,
 free the block and return `NULL`.
@@ -689,7 +689,7 @@ to allocate more memory, `memcpy` to move the old memory to the new memory, and
 
 ## Reallocating to a Larger Size
 
-When reallocating to a larger size, always follow these three steps:
+When reallocating to a larger size, it follows these three steps:
 
 1. Call `sf_malloc` to obtain a larger block.
 
@@ -698,21 +698,21 @@ returned by `sf_malloc`.  Be sure to copy the entire payload area, but no more.
 
 3. Call `sf_free` on the block given by the client (coalescing if necessary).
 
-4. Return the block given to you by `sf_malloc` to the client.
+4. Return the block given to the by `sf_malloc` to the client.
 
 If `sf_malloc` returns `NULL`, `sf_realloc` must also return `NULL`. Note that
-you do not need to set `sf_errno` in `sf_realloc` because `sf_malloc` should
+it does not need to set `sf_errno` in `sf_realloc` because `sf_malloc` should
 take care of this.
 
 ## Reallocating to a Smaller Size
 
-When reallocating to a smaller size, your allocator must use the block that was
-passed by the caller.  You must attempt to split the returned block. There are
+When reallocating to a smaller size, the allocator must use the block that was
+passed by the caller.  It must attempt to split the returned block. There are
 two cases for splitting:
 
-- Splitting the returned block results in a splinter. In this case, do not
-split the block. Leave the splinter in the block, update the header field
-if necessary, and return the same block back to the caller.
+- Splitting the returned block results in a splinter. In this case, it does not
+split the block. Leaves the splinter in the block, updates the header field
+if necessary, and returns the same block back to the caller.
 
 **Example:**
 
@@ -730,13 +730,13 @@ if necessary, and return the same block back to the caller.
 In the example above, splitting the block would have caused a 24-byte splinter.
 Therefore, the block is not split.
 
-- The block can be split without creating a splinter. In this case, split the
-block and update the block size fields in both headers.  Free the remaining block
+- The block can be split without creating a splinter. In this case, it splits the
+block and updates the block size fields in both headers.  Free the remaining block
 by inserting it into the appropriate free list (after coalescing, if possible).
-Return a pointer to the payload of the now-smaller block to the caller.
+Returns a pointer to the payload of the now-smaller block to the caller.
 
-Note that in both of these sub-cases, you return a pointer to the same block
-that was given to you.
+Note that in both of these sub-cases, it returns a pointer to the same block
+that was given to it.
 
 **Example:**
 
@@ -820,5 +820,5 @@ void sf_show_free_lists();
 void sf_show_heap();
 ```
 
-We have provided these functions to help you visualize your free lists and
+These functions have been provided to help visualize the free lists and
 allocated blocks.
