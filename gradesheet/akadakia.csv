@@ -1,0 +1,50 @@
+Graded Commit:c69fa5579ebc90c729764283dae5657f11d8ecfe
+
+TEST NAME, POINTS,OUT OF
+sf_memsuite_grading/free_block_too_small,1,1,
+sf_memsuite_grading/free_null,0,1,0 assertion(s) failed.: None
+sf_memsuite_grading/free_prev_alloc,1,1,
+sf_memsuite_grading/free_unallocated,1,1,
+sf_memsuite_grading/initialization,1,1,
+sf_memsuite_grading/malloc_free_coalesce_both,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x562b509f35f0. Should be: 0
+sf_memsuite_grading/malloc_free_coalesce_lower,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x555aed33b5f0. Should be: 0
+sf_memsuite_grading/malloc_free_coalesce_upper,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x55d4d1ec85f0. Should be: 0
+sf_memsuite_grading/malloc_free_first_block,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x5562a58ea2f0. Should be: 0
+sf_memsuite_grading/malloc_free_last_block,0,1,"1 assertion(s) failed.: tests/__grading_helpers.c:210: Block 0x563486af52f0 has wrong block_size (got 3716, expected 3712)"
+sf_memsuite_grading/malloc_free_lifo,1,1,
+sf_memsuite_grading/malloc_free_no_coalesce,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x556325c54430. Should be: 0
+sf_memsuite_grading/malloc_to_exhaustion,0,1,"1 assertion(s) failed.: tests/grading_tests_p1.c:428: block has incorrect size (size=132, exp=128 or 192)"
+sf_memsuite_grading/malloc_with_splinter,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x5578159df170. Should be: 1
+sf_memsuite_grading/realloc_larger,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x55ff9124a270. Should be: 0
+sf_memsuite_grading/realloc_same,1,1,
+sf_memsuite_grading/realloc_size_0,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x556ce1ed15b0. Should be: 0
+sf_memsuite_grading/realloc_smaller,1,1,
+sf_memsuite_grading/realloc_splinter,1,1,
+sf_memsuite_grading/sf_memalign_test_1,1,1,
+sf_memsuite_grading/sf_memalign_test_2,1,1,
+sf_memsuite_grading/sf_memalign_test_3,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x55c4e07d6230. Should be: 0
+sf_memsuite_grading/single_malloc_1,1,1,
+sf_memsuite_grading/single_malloc_12000,1,1,
+sf_memsuite_grading/single_malloc_16,1,1,
+sf_memsuite_grading/single_malloc_32,1,1,
+sf_memsuite_grading/single_malloc_4,1,1,
+sf_memsuite_grading/single_malloc_4024,0,1,1 assertion(s) failed.: tests/__grading_helpers.c:99: Prev allocated bit is not correctly set for 0x56451ce20170. Should be: 1
+sf_memsuite_grading/single_malloc_4040,1,1,
+sf_memsuite_grading/single_malloc_8,1,1,
+sf_memsuite_grading/single_malloc_max,1,1,
+sf_memsuite_grading/stress_test,0,1,
+sf_memsuite_student/free_coalesce,1,1,
+sf_memsuite_student/free_no_coalesce,1,1,
+sf_memsuite_student/free_quick,1,1,
+sf_memsuite_student/freelist,1,1,
+sf_memsuite_student/malloc_an_int,1,1,
+sf_memsuite_student/malloc_three_pages,1,1,
+sf_memsuite_student/malloc_too_large,1,1,
+sf_memsuite_student/realloc_larger_block,1,1,
+sf_memsuite_student/realloc_smaller_block_free_block,1,1,
+sf_memsuite_student/realloc_smaller_block_splinter,1,1,
+total,28,42extra_test1,0.6,0.6
+extra_test2,0.6,0.6
+extra_test3,0.6,0.6
+extra_test4,0.6,0.6
+extra_test5,0.6,0.6
