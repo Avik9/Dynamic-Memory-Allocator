@@ -3,8 +3,7 @@
 #include <signal.h>
 #include "debug.h"
 #include "sfmm.h"
-
-#include "helper.h"
+#define TEST_TIMEOUT 15
 
 void assert_free_block_count(size_t size, int count);
 void assert_free_list_block_count(size_t size, int count);
@@ -13,50 +12,41 @@ void assert_free_list_block_count(size_t size, int count);
  * Assert the total number of free blocks of a specified size.
  * If size == 0, then assert the total number of all free blocks.
  */
-void assert_free_block_count(size_t size, int count)
-{
-	int cnt = 0;
-	for (int i = 0; i < NUM_FREE_LISTS; i++)
-	{
-		sf_block *bp = sf_free_list_heads[i].body.links.next;
-		while (bp != &sf_free_list_heads[i])
-		{
-			if (size == 0 || size == (bp->header & BLOCK_SIZE_MASK))
-				cnt++;
-			bp = bp->body.links.next;
-		}
+void assert_free_block_count(size_t size, int count) {
+    int cnt = 0;
+    for(int i = 0; i < NUM_FREE_LISTS; i++) {
+	sf_block *bp = sf_free_list_heads[i].body.links.next;
+	while(bp != &sf_free_list_heads[i]) {
+	    if(size == 0 || size == (bp->header & BLOCK_SIZE_MASK))
+		cnt++;
+	    bp = bp->body.links.next;
 	}
-	if (size == 0)
-	{
-		cr_assert_eq(cnt, count, "Wrong number of free blocks (exp=%d, found=%d)",
-					 count, cnt);
-	}
-	else
-	{
-		cr_assert_eq(cnt, count, "Wrong number of free blocks of size %ld (exp=%d, found=%d)",
-					 size, count, cnt);
-	}
+    }
+    if(size == 0) {
+	cr_assert_eq(cnt, count, "Wrong number of free blocks (exp=%d, found=%d)",
+		     count, cnt);
+    } else {
+	cr_assert_eq(cnt, count, "Wrong number of free blocks of size %ld (exp=%d, found=%d)",
+		     size, count, cnt);
+    }
 }
 
 /*
  * Assert that the free list with a specified index has the specified number of
  * blocks in it.
  */
-void assert_free_list_size(int index, int size)
-{
-	int cnt = 0;
-	sf_block *bp = sf_free_list_heads[index].body.links.next;
-	while (bp != &sf_free_list_heads[index])
-	{
-		cnt++;
-		bp = bp->body.links.next;
-	}
-	cr_assert_eq(cnt, size, "Free list %d has wrong number of free blocks (exp=%d, found=%d)",
-				 index, size, cnt);
+void assert_free_list_size(int index, int size) {
+    int cnt = 0;
+    sf_block *bp = sf_free_list_heads[index].body.links.next;
+    while(bp != &sf_free_list_heads[index]) {
+	cnt++;
+	bp = bp->body.links.next;
+    }
+    cr_assert_eq(cnt, size, "Free list %d has wrong number of free blocks (exp=%d, found=%d)",
+		 index, size, cnt);
 }
 
-Test(sf_memsuite_student, malloc_an_int, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, malloc_an_int, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	int *x = sf_malloc(sizeof(int));
 
@@ -68,25 +58,23 @@ Test(sf_memsuite_student, malloc_an_int, .init = sf_mem_init, .fini = sf_mem_fin
 
 	assert_free_block_count(0, 1);
 	assert_free_block_count(3904, 1);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
+	assert_free_list_size(NUM_FREE_LISTS-1, 1);
 
 	cr_assert(sf_errno == 0, "sf_errno is not zero!");
 	cr_assert(sf_mem_start() + PAGE_SZ == sf_mem_end(), "Allocated more than necessary!");
 }
 
-Test(sf_memsuite_student, malloc_three_pages, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, malloc_three_pages, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	// We want to allocate up to exactly three pages.
-	void *x = sf_malloc(3 * PAGE_SZ - ((1 << 6) - sizeof(sf_header)) - 64 - 2 * sizeof(sf_header));
+	void *x = sf_malloc(3 * PAGE_SZ - ((1 << 6) - sizeof(sf_header)) - 64 - 2*sizeof(sf_header));
 
 	cr_assert_not_null(x, "x is NULL!");
 	assert_free_block_count(0, 0);
 	cr_assert(sf_errno == 0, "sf_errno is not 0!");
 }
 
-Test(sf_memsuite_student, malloc_too_large, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, malloc_too_large, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	void *x = sf_malloc(PAGE_SZ << 16);
 
@@ -96,22 +84,21 @@ Test(sf_memsuite_student, malloc_too_large, .init = sf_mem_init, .fini = sf_mem_
 	cr_assert(sf_errno == ENOMEM, "sf_errno is not ENOMEM!");
 }
 
-Test(sf_memsuite_student, free_quick, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, free_quick, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	/* void *x = */ sf_malloc(8);
 	void *y = sf_malloc(32);
 	/* void *z = */ sf_malloc(1);
 
 	sf_free(y);
+
 	assert_free_block_count(0, 2);
 	assert_free_block_count(64, 1);
 	assert_free_block_count(3776, 1);
 	cr_assert(sf_errno == 0, "sf_errno is not zero!");
 }
 
-Test(sf_memsuite_student, free_no_coalesce, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, free_no_coalesce, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	/* void *x = */ sf_malloc(8);
 	void *y = sf_malloc(200);
@@ -125,8 +112,7 @@ Test(sf_memsuite_student, free_no_coalesce, .init = sf_mem_init, .fini = sf_mem_
 	cr_assert(sf_errno == 0, "sf_errno is not zero!");
 }
 
-Test(sf_memsuite_student, free_coalesce, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, free_coalesce, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	sf_errno = 0;
 	/* void *w = */ sf_malloc(8);
 	void *x = sf_malloc(200);
@@ -142,8 +128,7 @@ Test(sf_memsuite_student, free_coalesce, .init = sf_mem_init, .fini = sf_mem_fin
 	cr_assert(sf_errno == 0, "sf_errno is not zero!");
 }
 
-Test(sf_memsuite_student, freelist, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, freelist, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	void *u = sf_malloc(200);
 	/* void *v = */ sf_malloc(300);
 	void *w = sf_malloc(200);
@@ -159,24 +144,23 @@ Test(sf_memsuite_student, freelist, .init = sf_mem_init, .fini = sf_mem_fini)
 	assert_free_block_count(256, 3);
 	assert_free_block_count(1600, 1);
 	assert_free_list_size(3, 3);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
+	assert_free_list_size(NUM_FREE_LISTS-1, 1);
 
 	// First block in list should be the most recently freed block.
 	int i = 3;
 	sf_block *bp = sf_free_list_heads[i].body.links.next;
-	cr_assert_eq(bp, (char *)y - 2 * sizeof(sf_header),
-				 "Wrong first block in free list %d: (found=%p, exp=%p)",
-				 i, bp, (char *)y - 2 * sizeof(sf_header));
+	cr_assert_eq(bp, (char *)y - 2*sizeof(sf_header),
+		     "Wrong first block in free list %d: (found=%p, exp=%p)",
+                     i, bp, (char *)y - 2*sizeof(sf_header));
 }
 
-Test(sf_memsuite_student, realloc_larger_block, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, realloc_larger_block, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	void *x = sf_malloc(sizeof(int));
 	/* void *y = */ sf_malloc(10);
 	x = sf_realloc(x, sizeof(int) * 20);
 
 	cr_assert_not_null(x, "x is NULL!");
-	sf_block *bp = (sf_block *)((char *)x - 2 * sizeof(sf_header));
+	sf_block *bp = (sf_block *)((char *)x - 2*sizeof(sf_header));
 	cr_assert(bp->header & THIS_BLOCK_ALLOCATED, "Allocated bit is not set!");
 	cr_assert((bp->header & BLOCK_SIZE_MASK) == 128, "Realloc'ed block size not what was expected!");
 
@@ -185,15 +169,14 @@ Test(sf_memsuite_student, realloc_larger_block, .init = sf_mem_init, .fini = sf_
 	assert_free_block_count(3712, 1);
 }
 
-Test(sf_memsuite_student, realloc_smaller_block_splinter, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, realloc_smaller_block_splinter, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	void *x = sf_malloc(sizeof(int) * 20);
 	void *y = sf_realloc(x, sizeof(int) * 16);
 
 	cr_assert_not_null(y, "y is NULL!");
 	cr_assert(x == y, "Payload addresses are different!");
 
-	sf_block *bp = (sf_block *)((char *)y - 2 * sizeof(sf_header));
+	sf_block *bp = (sf_block *)((char*)y - 2*sizeof(sf_header));
 	cr_assert(bp->header & THIS_BLOCK_ALLOCATED, "Allocated bit is not set!");
 	cr_assert((bp->header & BLOCK_SIZE_MASK) == 128, "Block size not what was expected!");
 
@@ -202,14 +185,13 @@ Test(sf_memsuite_student, realloc_smaller_block_splinter, .init = sf_mem_init, .
 	assert_free_block_count(3840, 1);
 }
 
-Test(sf_memsuite_student, realloc_smaller_block_free_block, .init = sf_mem_init, .fini = sf_mem_fini)
-{
+Test(sf_memsuite_student, realloc_smaller_block_free_block, .init = sf_mem_init, .fini = sf_mem_fini, .timeout = TEST_TIMEOUT) {
 	void *x = sf_malloc(sizeof(double) * 8);
 	void *y = sf_realloc(x, sizeof(int));
 
 	cr_assert_not_null(y, "y is NULL!");
 
-	sf_block *bp = (sf_block *)((char *)y - 2 * sizeof(sf_header));
+	sf_block *bp = (sf_block *)((char*)y - 2*sizeof(sf_header));
 	cr_assert(bp->header & THIS_BLOCK_ALLOCATED, "Allocated bit is not set!");
 	cr_assert((bp->header & BLOCK_SIZE_MASK) == 64, "Realloc'ed block size not what was expected!");
 
@@ -223,124 +205,3 @@ Test(sf_memsuite_student, realloc_smaller_block_free_block, .init = sf_mem_init,
 //STUDENT UNIT TESTS SHOULD BE WRITTEN BELOW
 //DO NOT DELETE THESE COMMENTS
 //############################################
-Test(sf_memsuite_student, default_by_professor, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-    double *ptr = sf_malloc(sizeof(double));
-
-    *ptr = 320320320e-320;
-
-    sf_free(ptr);
-
-	assert_free_block_count(0, 1);
-	assert_free_block_count(3968, 1);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
-}
-
-Test(sf_memsuite_student, malloc_size_0, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	void *x = sf_malloc(0);
-
-	cr_assert(EINVAL != sf_errno);
-	cr_assert_null(x);
-}
-
-Test(sf_memsuite_student, round_num_to_64_128, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	cr_assert(round_to_64(100) == 128);
-}
-
-Test(sf_memsuite_student, round_num_to_64_0, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	cr_assert(round_to_64(0) == 0);
-}
-
-Test(sf_memsuite_student, list_position_0, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	cr_assert(list_position(sizeof(double)) == 0);
-}
-
-Test(sf_memsuite_student, list_position_9, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	cr_assert(list_position(sizeof(double) << 10) == 8);
-}
-
-Test(sf_memsuite_student, malloc_malloc_free_free, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	int *a = sf_malloc(3960);
-	int *b = sf_malloc(sizeof(int));
-
-	sf_free(a);
-	sf_free(b);
-
-	assert_free_block_count(0, 1);
-	assert_free_block_count(8064, 1);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
-}
-
-Test(sf_memsuite_student, malloc_free_malloc_free, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	int *a = sf_malloc(3960);
-	sf_free(a);
-
-	int *b = sf_malloc(sizeof(int));
-	sf_free(b);
-
-	assert_free_block_count(0, 1);
-	assert_free_block_count(3968, 1);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
-}
-
-Test(sf_memsuite_student, sf_memalign_alignment_not_power_of_2, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	void *x = sf_memalign(sizeof(double), 70);
-
-	cr_assert(EINVAL == sf_errno, "EINVAL != sf_errno");
-	cr_assert_null(x, "x is NOT NULL!");
-}
-
-Test(sf_memsuite_student, sf_memalign_alignment_too_small, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	void *x = sf_memalign(sizeof(double), 32);
-
-	cr_assert(EINVAL == sf_errno);
-	cr_assert_null(x);
-}
-
-Test(sf_memsuite_student, memalign_an_int_align_64, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	sf_errno = 0;
-	int *x = sf_memalign(sizeof(int), 64);
-
-	cr_assert_not_null(x, "x is NULL!");
-
-	*x = 4;
-
-	cr_assert(*x == 4, "sf_malloc failed to give proper space for an int!");
-
-	assert_free_block_count(0, 1);
-	assert_free_block_count(3904, 1);
-	assert_free_list_size(NUM_FREE_LISTS - 1, 1);
-
-	cr_assert(sf_errno == 0, "sf_errno is not zero!");
-	cr_assert(sf_mem_start() + PAGE_SZ == sf_mem_end(), "Allocated more than necessary!");
-}
-
-Test(sf_memsuite_student, is_power_of_2_false, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-	cr_assert(is_power_of_2(80) == 0, "80 is not a power of 2!");
-}
-
-Test(sf_memsuite_student, is_power_of_2_true, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-		cr_assert(is_power_of_2(32) == 1, "32 is a power of 2!");
-}
-
-Test(sf_memsuite_student, is_power_of_2_0, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-		cr_assert(is_power_of_2(0) == 1, "0 is a power of 2!");
-}
-
-Test(sf_memsuite_student, is_power_of_2_1, .init = sf_mem_init, .fini = sf_mem_fini)
-{
-		cr_assert(is_power_of_2(1) == 1, "1 is a power of 2!");
-}
